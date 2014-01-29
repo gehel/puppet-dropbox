@@ -1,5 +1,5 @@
 # Class removal
 #
-class { 'puppet-dropbox':
+class { 'dropbox':
   absent => true,
 }

@@ -1,5 +1,5 @@
 # Disable class service
 #
-class { 'puppet-dropbox':
+class { 'dropbox':
   disable => true,
 }

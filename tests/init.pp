@@ -1,4 +1,4 @@
 # Default class installation
 #
-class { 'puppet-dropbox':
+class { 'dropbox':
 }
