@@ -13,29 +13,6 @@
 #   If defined, dropbox class will automatically "include $my_class"
 #   Can be defined also by the (top scope) variable $dropbox_myclass
 #
-# [*source*]
-#   Sets the content of source parameter for main configuration file
-#   If defined, dropbox main config file will have the param: source => $source
-#   Can be defined also by the (top scope) variable $dropbox_source
-#
-# [*source_dir*]
-#   If defined, the whole dropbox configuration directory content is retrieved
-#   recursively from the specified source
-#   (source => $source_dir , recurse => true)
-#   Can be defined also by the (top scope) variable $dropbox_source_dir
-#
-# [*source_dir_purge*]
-#   If set to true (default false) the existing configuration directory is
-#   mirrored with the content retrieved from source_dir
-#   (source => $source_dir , recurse => true , purge => true)
-#   Can be defined also by the (top scope) variable $dropbox_source_dir_purge
-#
-# [*template*]
-#   Sets the path to the template to use as content for main configuration file
-#   If defined, dropbox main config file has: content => content("$template")
-#   Note source and template parameters are mutually exclusive: don't use both
-#   Can be defined also by the (top scope) variable $dropbox_template
-#
 # [*options*]
 #   An hash of custom options to be used in templates for arbitrary settings.
 #   Can be defined also by the (top scope) variable $dropbox_options
@@ -71,12 +48,6 @@
 # [*package*]
 #   The name of dropbox package
 #
-# [*config_dir*]
-#   Main configuration directory. Used by puppi
-#
-# [*config_file*]
-#   Main configuration file path
-#
 # == Examples
 #
 # You can use this class in 2 ways:
@@ -101,8 +72,8 @@ class dropbox (
 
   # ## Definition of some variables used in the module
   $manage_package = $dropbox::bool_absent ? {
-    true  => 'absent',
-    false => $dropbox::version,
+    true    => 'absent',
+    default => $dropbox::version,
   }
 
   $manage_file = $dropbox::bool_absent ? {
@@ -111,23 +82,13 @@ class dropbox (
   }
 
   $manage_audit = $dropbox::bool_audit_only ? {
-    true  => 'all',
-    false => undef,
+    true    => 'all',
+    default => undef,
   }
 
   $manage_file_replace = $dropbox::bool_audit_only ? {
-    true  => false,
-    false => true,
-  }
-
-  $manage_file_source = $dropbox::source ? {
-    ''      => undef,
-    default => $dropbox::source,
-  }
-
-  $manage_file_content = $dropbox::template ? {
-    ''      => undef,
-    default => template($dropbox::template),
+    true    => false,
+    default => true,
   }
 
   if $dropbox::bool_manage_repo {
@@ -138,36 +99,6 @@ class dropbox (
   package { $dropbox::package:
     ensure => $dropbox::manage_package,
     noop   => $dropbox::bool_noops,
-  }
-
-  file { 'dropbox.conf':
-    ensure  => $dropbox::manage_file,
-    path    => $dropbox::config_file,
-    mode    => $dropbox::config_file_mode,
-    owner   => $dropbox::config_file_owner,
-    group   => $dropbox::config_file_group,
-    require => Package[$dropbox::package],
-    source  => $dropbox::manage_file_source,
-    content => $dropbox::manage_file_content,
-    replace => $dropbox::manage_file_replace,
-    audit   => $dropbox::manage_audit,
-    noop    => $dropbox::bool_noops,
-  }
-
-  # The whole dropbox configuration directory can be recursively overriden
-  if $dropbox::source_dir {
-    file { 'dropbox.dir':
-      ensure  => directory,
-      path    => $dropbox::config_dir,
-      require => Package[$dropbox::package],
-      source  => $dropbox::source_dir,
-      recurse => true,
-      purge   => $dropbox::bool_source_dir_purge,
-      force   => $dropbox::bool_source_dir_purge,
-      replace => $dropbox::manage_file_replace,
-      audit   => $dropbox::manage_audit,
-      noop    => $dropbox::bool_noops,
-    }
   }
 
   # ## Include custom class if $my_class is set
