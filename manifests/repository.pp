@@ -5,6 +5,8 @@ class dropbox::repository {
         url        => "http://linux.dropbox.com/debian",
         distro     => $::lsbdistcodename,
         repository => 'main',
+        key        => '5044912E',
+        keyserver  => 'pgp.mit.edu',
       }
     }
     /(?i:Ubuntu)/ : {
@@ -12,6 +14,8 @@ class dropbox::repository {
         url        => "http://linux.dropbox.com/ubuntu",
         distro     => $::lsbdistcodename,
         repository => 'main',
+        key        => '5044912E',
+        keyserver  => 'pgp.mit.edu',
       }
     }
     default       : {
